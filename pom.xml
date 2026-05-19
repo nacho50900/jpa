@@ -1,0 +1,142 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>uo.ri</groupId>
+	<artifactId>cws</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>cws_util</module>
+		<module>cws_service_interfaces</module>
+		<module>cws_services_jpa</module>
+		<module>cws_aceptance_tests</module>
+		<module>cws_client_manager</module>
+		<module>cws_client_cashier</module>
+		<module>cws_client_mechanic</module>
+		<module>cws_client_foreman</module>
+	</modules>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<profiles>
+		<profile>
+			<id>tests_dom</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>3.5.0</version>
+						<configuration>
+							<excludes>
+								<exclude>**/ExtTests_*.java</exclude>
+							</excludes>
+							<parallel>classesAndMethods</parallel>
+							<parallelTestsTimeoutForcedInSeconds>20</parallelTestsTimeoutForcedInSeconds>
+							<parallelTestsTimeoutInSeconds>10</parallelTestsTimeoutInSeconds>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>tests_acpt</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>3.5.0</version>
+						<configuration>
+							<includes>
+								<include>**/ExtTests_*.java</include>
+							</includes>
+							<excludes>
+								<exclude>**/*Tests.java</exclude>
+							</excludes>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+	<!--	
+		<testSourceDirectory>test</testSourceDirectory>
+		<outputDirectory>bin</outputDirectory>
+	-->
+		
+		<resources>
+			<resource>
+				<directory>src</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.13.0</version>
+				<configuration>
+<!-- 
+					<verbose>true</verbose>
+-->
+					<source>21</source>
+					<target>21</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.5.0</version>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>3.4.0</version>
+				<executions>
+					<execution>
+						<id>add-test-source</id>
+						<phase>generate-test-sources</phase>
+						<goals>
+							<goal>add-test-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>test</source>
+								<source>test_extended</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		
+ 		<pluginManagement>
+			<plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>3.5.1</version>
+                </plugin>
+			</plugins>
+		</pluginManagement>
+		
+	</build>
+
+	<dependencies>
+	</dependencies>
+
+</project>

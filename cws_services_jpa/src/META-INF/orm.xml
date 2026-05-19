@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="https://jakarta.ee/xml/ns/persistence/orm"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence/orm https://jakarta.ee/xml/ns/persistence/orm/orm_3_1.xsd"
+	version="3.1">
+	
+	<!-- Vehicle queries -->
+	<named-query name="Vehicle.findByPlate">
+		<query>select v from Vehicle v where v.plateNumber = ?1</query>
+	</named-query>
+
+	<!-- WorkOrder queries -->
+	<named-query name="WorkOrder.findByIds">
+		<query>select w from WorkOrder w where w.id in ?1</query>
+	</named-query>
+	
+	<named-query name="WorkOrder.findByClientNif">
+		<query>SELECT w FROM WorkOrder w 
+       		   WHERE w.vehicle.client.nif = ?1</query>
+	</named-query>
+	
+	<named-query name="WorkOrder.findNotInvoicedByClientNif">
+		<query>SELECT w FROM WorkOrder w 
+       		   WHERE w.vehicle.client.nif = ?1 
+       		   AND w.invoice IS NULL 
+       		   AND w.state = uo.ri.cws.domain.WorkOrder$WorkOrderState.FINISHED</query>
+	</named-query>
+	
+	<named-query name="WorkOrder.findByPlateNumber">
+		<query>SELECT w FROM WorkOrder w 
+       		   WHERE w.vehicle.plateNumber = ?1</query>
+	</named-query>
+
+	<!-- PaymentMean queries -->
+	<named-query name="PaymentMean.findByInvoiceId">
+		<query>
+			select m
+			from Invoice f
+				join f.workOrders w
+				join w.vehicle.client c
+				join c.paymentMeans m
+			where f.id = ?1
+		</query>
+	</named-query>
+
+	<!-- Mechanic queries -->
+	<named-query name="Mechanic.findByNif">
+		<query>
+			select m
+			from Mechanic m
+			where m.nif = ?1
+		</query>
+	</named-query>
+
+	<!-- Invoice queries -->
+	<named-query name="Invoice.findByNumber">
+		<query>select f from Invoice f where f.number = ?1</query>
+	</named-query>
+
+	<named-query name="Invoice.getNextInvoiceNumber">
+		<query>
+			select cast( coalesce(max(f.number) + 1, 1L) as bigint ) 
+			from Invoice f
+		</query>
+<!-- 	
+		This breaks if there is none invoice
+		<query>select max(f.number) + 1 from Invoice f</query>
+-->
+	</named-query>
+	
+	<!--Contract queries-->
+	<named-query name="Contract.findAll">
+		<query>SELECT c FROM Contract c
+		</query>
+	</named-query>
+	
+	<named-query name="Contract.findAllInForce">
+		<query>SELECT c FROM Contract c WHERE c.state = :state</query>
+	</named-query>
+	
+	<!--
+	<named-query name="Contract.findEligibleForPayrollGeneration">
+		<query>SELECT DISTINCT c FROM Contract c
+            WHERE c.isActive = true 
+            AND c.startDate <= :monthEnd 
+            AND (c.endDate IS NULL OR c.endDate >= :monthStart)
+            AND NOT EXISTS (
+                SELECT p FROM Payroll p
+                WHERE p.contract = c
+                AND p.month = :monthStart)
+        </query>
+	</named-query>
+	-->
+
+	<!-- PayRoll queries -->
+	<named-query name="Payroll.findByContract">
+		<query>SELECT p FROM Payroll p 
+               WHERE p.contract.id = :cid 
+               ORDER BY p.date DESC
+        </query>
+	</named-query>
+		
+	<named-query name="Payroll.findLastMonthPayrolls">
+		<query>SELECT p FROM Payroll p 
+                WHERE p.date BETWEEN :start AND :end 
+                ORDER BY p.date DESC
+        </query>
+	</named-query>
+	
+	<named-query name="Payroll.findLastPayrollByMechanicId">
+		<query>SELECT p FROM Payroll p 
+                WHERE p.contract.mechanic.id = :mid 
+                ORDER BY p.date DESC
+        </query>
+	</named-query>
+	
+	<named-query name="Payroll.findByProfessionalGroupName">
+		<query>SELECT p FROM Payroll p 
+                WHERE p.contract.professionalGroup.name = :name 
+                ORDER BY p.date DESC
+         </query>
+	</named-query>
+	
+	<named-query name="Payroll.findByMechanicId">
+		<query>SELECT p FROM Payroll p 
+                WHERE p.contract.mechanic.id = :mid 
+                ORDER BY p.date DESC
+        </query>
+	</named-query>
+	
+	<named-query name="Payroll.findByContractIdAndDate">
+		<query>SELECT p FROM Payroll p 
+               WHERE p.contract.id = :cid AND p.date = :date
+        </query>
+	</named-query>
+
+	<!-- ProfessionalGroup queries -->
+	<named-query name="ProfessionalGroup.findByName">
+		<query>SELECT pg
+			FROM ProfessionalGroup pg
+			WHERE pg.name = :name
+		</query>
+	</named-query>
+	
+		<named-query name="ProfessionalGroup.findAll">
+		<query>SELECT pg FROM ProfessionalGroup pg
+        </query>
+	</named-query>
+
+
+	<!-- 
+	Use this format if your query has greater than numeric comparisons the one
+	in this example
+	
+	<named-query name="findItemsOnSaleByCategoryId">
+	<query>
+			<![CDATA[
+			select i 
+			from Item i join i.categories c
+			where c.id = ?2
+				and i.startDate <= ?1
+				and i.endDate >= ?1 
+			]]>
+	</query>
+	</named-query>
+ -->
+
+</entity-mappings>
