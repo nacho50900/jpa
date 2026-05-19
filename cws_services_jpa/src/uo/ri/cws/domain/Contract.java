@@ -64,7 +64,7 @@ public class Contract extends BaseEntity {
         ArgumentChecks.isNotNull(group, "ProfessionalGroup cannot be null");
         ArgumentChecks.isNotNull(signingDate, "Signing date cannot be null");
         ArgumentChecks.isTrue(
-        		annualBaseSalary > 0.0, "Annual base salary cannot be negative");
+        		annualBaseSalary >= 0.0, "Annual base salary cannot be negative");
 
         LocalDate adjustedStart = signingDate.with(TemporalAdjusters.firstDayOfMonth());
     
@@ -228,7 +228,7 @@ public class Contract extends BaseEntity {
         return mechanic;
     }
 
-    public void _setTaxRate(double taxRate) {
+    void _setTaxRate(double taxRate) {
         if (taxRate < 0.0) {
             throw new IllegalArgumentException("Tax rate cannot be negative");
         }
@@ -255,7 +255,7 @@ public class Contract extends BaseEntity {
         return annualBaseSalary;
     }
     
-    public void _setAnnualBaseSalary(double annualBaseSalary) {
+    void _setAnnualBaseSalary(double annualBaseSalary) {
         if (annualBaseSalary < 0.0) {
             throw new IllegalArgumentException(
             		"Annual base salary cannot be negative");
@@ -275,7 +275,7 @@ public class Contract extends BaseEntity {
         return Collections.unmodifiableSet(payrolls);
     }
 
-    public Set<Payroll> _getPayrolls() {
+    Set<Payroll> _getPayrolls() {
         return payrolls;
     }
 
@@ -283,15 +283,15 @@ public class Contract extends BaseEntity {
 		return state;
 	}
 
-	public void _setMechanic(Mechanic mechanic) {
+	void _setMechanic(Mechanic mechanic) {
 		this.mechanic = mechanic;
 	}
 
-	public void _setContractType(ContractType contractType) {
+	void _setContractType(ContractType contractType) {
 		this.contractType = contractType;
 	}
 
-	public void _setProfessionalGroup(ProfessionalGroup professionalGroup) {
+	void _setProfessionalGroup(ProfessionalGroup professionalGroup) {
 		this.professionalGroup = professionalGroup;
 	}
 	

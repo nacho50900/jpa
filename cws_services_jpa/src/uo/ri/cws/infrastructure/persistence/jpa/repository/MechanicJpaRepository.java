@@ -17,7 +17,7 @@ public class MechanicJpaRepository
 	        .createNamedQuery(
 	        		"Mechanic.findByNif", 
 	        		Mechanic.class)
-	        .setParameter("1", nif)
+	        .setParameter(1, nif)
 	        .getResultStream() 
 	        .findFirst();
 

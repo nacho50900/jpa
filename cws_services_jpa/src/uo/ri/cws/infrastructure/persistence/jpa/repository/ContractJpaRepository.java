@@ -16,7 +16,7 @@ public class ContractJpaRepository
 	public List<Contract> findAll() {
 	    return Jpa.getManager()
 	        .createNamedQuery(
-	        		"Contact.findAll", 
+	        		"Contract.findAll", 
 	        		Contract.class)
 	        .getResultList();
 	}

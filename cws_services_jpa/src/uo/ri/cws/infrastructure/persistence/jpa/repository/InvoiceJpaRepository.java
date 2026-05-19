@@ -28,6 +28,6 @@ public class InvoiceJpaRepository
 	        .createNamedQuery("Invoice.getNextInvoiceNumber")
 	        .getSingleResult();
 	    
-	    return result != null ? result.longValue() + 1L : 1L;
+	    return result != null ? result.longValue() : 1L;
 	}
 }

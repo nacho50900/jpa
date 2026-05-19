@@ -77,11 +77,11 @@ public class Charge extends BaseEntity {
 		return paymentMean;
 	}
 
-	public void _setInvoice(Invoice invoice) {
+	void _setInvoice(Invoice invoice) {
 		this.invoice = invoice;
 	}
 
-	public void _setPaymentMean(PaymentMean paymentMean) {
+	void _setPaymentMean(PaymentMean paymentMean) {
 		this.paymentMean = paymentMean;
 	}
 	
