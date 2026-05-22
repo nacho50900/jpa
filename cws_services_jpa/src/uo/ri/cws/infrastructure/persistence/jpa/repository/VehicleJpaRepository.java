@@ -1,5 +1,6 @@
 package uo.ri.cws.infrastructure.persistence.jpa.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import uo.ri.cws.application.repository.VehicleRepository;
@@ -8,15 +9,23 @@ import uo.ri.cws.infrastructure.persistence.jpa.util.BaseJpaRepository;
 import uo.ri.cws.infrastructure.persistence.jpa.util.Jpa;
 
 public class VehicleJpaRepository extends BaseJpaRepository<Vehicle>
-	implements VehicleRepository {
+        implements VehicleRepository {
 
-	@Override
-	public Optional<Vehicle> findByPlate(String plate) {
-		return Jpa.getManager()
-				.createNamedQuery("Vehicle.findByPlate", Vehicle.class)
-				.setParameter(1, plate)
-				.getResultList().stream()
-				.findFirst();
-	}
+    @Override
+    public Optional<Vehicle> findByPlate(String plate) {
+        return Jpa.getManager()
+                .createNamedQuery("Vehicle.findByPlate", Vehicle.class)
+                .setParameter(1, plate)
+                .getResultList().stream()
+                .findFirst();
+    }
+
+    @Override
+    public List<Vehicle> findByClientNif(String nif) {
+        return Jpa.getManager()
+                .createNamedQuery("Vehicle.findByClientNif", Vehicle.class)
+                .setParameter(1, nif)
+                .getResultList();
+    }
 
 }

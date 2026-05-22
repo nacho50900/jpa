@@ -116,4 +116,14 @@ public class SparePart extends BaseEntity
 	           ", minStock=" + minStock + ", maxStock=" + maxStock + "]";
 	}
 
+	// Added
+    public void setPrice(double price) {
+        uo.ri.util.assertion.ArgumentChecks.isTrue(price >= 0, "price can not be negative");
+        this.price = price;
+    }
+
+    public void setDescription(String description) {
+        uo.ri.util.assertion.ArgumentChecks.isNotBlank(description, "description can not be blank");
+        this.description = description;
+    }
 }

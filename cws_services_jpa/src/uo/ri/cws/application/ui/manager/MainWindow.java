@@ -9,68 +9,81 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 
+import uo.ri.cws.application.ui.manager.client.ClientsPanel;
 import uo.ri.cws.application.ui.manager.contract.ContractPanel;
+import uo.ri.cws.application.ui.manager.contractType.ContractTypePanel;
 import uo.ri.cws.application.ui.manager.mechanic.MechanicsPanel;
 import uo.ri.cws.application.ui.manager.payroll.PayrollPanel;
+import uo.ri.cws.application.ui.manager.professionalGroup.ProfessionalGroupPanel;
 import uo.ri.cws.application.ui.manager.sparepart.SparePartPanel;
+import uo.ri.cws.application.ui.manager.vehicle.VehiclesPanel;
 import uo.ri.cws.application.ui.manager.vehicletype.VehicleTypePanel;
+import uo.ri.cws.application.ui.manager.workorder.WorkOrderPanel;
 
 public class MainWindow extends JFrame {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     public MainWindow() {
         super("CWS - Car Workshop System");
         initializeComponents();
     }
-    
+
     private void initializeComponents() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(720, 490);
+        setSize(1000, 600);
         setLocationRelativeTo(null);
-        
         setJMenuBar(createMenuBar());
-        
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Mechanics", new MechanicsPanel());
-        tabbedPane.addTab("Contracts", new ContractPanel());
-        tabbedPane.addTab("Payrolls", new PayrollPanel());
-        tabbedPane.addTab("Spare Parts", new SparePartPanel());
-        tabbedPane.addTab("Vehicle Types", new VehicleTypePanel());
-        
-        getContentPane().add(tabbedPane, BorderLayout.CENTER);
+
+        JTabbedPane tabs = new JTabbedPane();
+
+        // ── Ejercicio 2 (tu parte original) ──────────────────────────────────
+        tabs.addTab("Mechanics",          new MechanicsPanel());
+        tabs.addTab("Professional Groups",new ProfessionalGroupPanel());
+        tabs.addTab("Payrolls",           new PayrollPanel());
+
+        // ── Ejercicio 0 ───────────────────────────────────────────────────────
+        tabs.addTab("Contract Types",     new ContractTypePanel());
+        tabs.addTab("Spare Parts",        new SparePartPanel());
+        tabs.addTab("Vehicle Types",      new VehicleTypePanel());
+
+        // ── Ejercicio 1 ───────────────────────────────────────────────────────
+        tabs.addTab("Contracts",          new ContractPanel());
+
+        // ── Base (Foreman / Mechanic / Cashier) ───────────────────────────────
+        tabs.addTab("Clients",            new ClientsPanel());
+        tabs.addTab("Vehicles",           new VehiclesPanel());
+        tabs.addTab("Work Orders",        new WorkOrderPanel());
+
+        getContentPane().add(tabs, BorderLayout.CENTER);
     }
-    
+
     private JMenuBar createMenuBar() {
-        JMenuBar menuBar = new JMenuBar();
-        
-        JMenu fileMenu = new JMenu("File");
-        JMenuItem exitItem = new JMenuItem("Exit");
-        exitItem.addActionListener(e -> {
-            int confirm = JOptionPane.showConfirmDialog(this,
-                "Are you sure you want to exit?",
-                "Confirm Exit",
-                JOptionPane.YES_NO_OPTION);
-            
-            if (confirm == JOptionPane.YES_OPTION) {
+        JMenuBar bar = new JMenuBar();
+
+        JMenu file = new JMenu("File");
+        JMenuItem exit = new JMenuItem("Exit");
+        exit.addActionListener(e -> {
+            if (JOptionPane.showConfirmDialog(this,
+                    "Are you sure you want to exit?",
+                    "Confirm Exit", JOptionPane.YES_NO_OPTION)
+                    == JOptionPane.YES_OPTION) {
                 System.exit(0);
             }
         });
-        fileMenu.add(exitItem);
-        menuBar.add(fileMenu);
-        
-        JMenu helpMenu = new JMenu("Help");
-        JMenuItem aboutItem = new JMenuItem("About");
-        aboutItem.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this,
-                "Car Workshop System\nDone by Ignacio Hoyos "
-                + "Diego with a little help of Oviedo university",
-                "About CWS",
-                JOptionPane.INFORMATION_MESSAGE);
-        });
-        helpMenu.add(aboutItem);
-        menuBar.add(helpMenu);
-        
-        return menuBar;
+        file.add(exit);
+        bar.add(file);
+
+        JMenu help = new JMenu("Help");
+        JMenuItem about = new JMenuItem("About");
+        about.addActionListener(e -> JOptionPane.showMessageDialog(this,
+                "Car Workshop System\n" +
+                "Universidad de Oviedo — EII RI 2024/25\n" +
+                "UO300737",
+                "About CWS", JOptionPane.INFORMATION_MESSAGE));
+        help.add(about);
+        bar.add(help);
+
+        return bar;
     }
 }

@@ -255,7 +255,7 @@ public class Contract extends BaseEntity {
         return annualBaseSalary;
     }
     
-    void _setAnnualBaseSalary(double annualBaseSalary) {
+    public void _setAnnualBaseSalary(double annualBaseSalary) {
         if (annualBaseSalary < 0.0) {
             throw new IllegalArgumentException(
             		"Annual base salary cannot be negative");

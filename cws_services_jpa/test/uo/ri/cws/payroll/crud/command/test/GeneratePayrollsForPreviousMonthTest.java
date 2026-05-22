@@ -265,7 +265,8 @@ class GeneratePayrollsForPreviousMonthTest {
         when(contract.getContractType()).thenReturn(type);
         when(contract.getProfessionalGroup()).thenReturn(group);
         when(contract.getAnnualBaseSalary()).thenReturn(30000.0);
-        when(contract._getPayrolls()).thenReturn(new HashSet<>());
+        when(contract.getPayrolls()).thenReturn(new HashSet<>());
+        //Antes era ._getPayrolls()
         
         return contract;
     }

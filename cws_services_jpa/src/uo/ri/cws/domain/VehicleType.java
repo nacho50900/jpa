@@ -70,4 +70,10 @@ public class VehicleType extends BaseEntity {
 	    return "VehicleType[name=" + name + ", pricePerHour=" + pricePerHour + "]";
 	}
 
+	// Added
+    public void setPricePerHour(double pricePerHour) {
+        uo.ri.util.assertion.ArgumentChecks.isTrue(pricePerHour >= 0,
+                "pricePerHour can not be negative");
+        this.pricePerHour = pricePerHour;
+    }
 }

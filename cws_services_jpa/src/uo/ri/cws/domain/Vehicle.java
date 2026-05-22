@@ -106,4 +106,15 @@ public class Vehicle extends BaseEntity {
 	           ", model=" + model + "]";
 	}
 	
+	// Added
+    public void setMake(String make) {
+        uo.ri.util.assertion.ArgumentChecks.isNotBlank(make, "make can not be blank");
+        this.make = make;
+    }
+
+    public void setModel(String model) {
+        uo.ri.util.assertion.ArgumentChecks.isNotBlank(model, "model can not be blank");
+        this.model = model;
+    }
+	
 }

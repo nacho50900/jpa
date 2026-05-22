@@ -8,6 +8,14 @@
 	<named-query name="Vehicle.findByPlate">
 		<query>select v from Vehicle v where v.plateNumber = ?1</query>
 	</named-query>
+	
+	<named-query name="Vehicle.findAll">
+		<query>select v from Vehicle v</query>
+	</named-query>
+	
+	<named-query name="Vehicle.findByClientNif">
+		<query>select v from Vehicle v where v.client.nif = ?1</query>
+	</named-query>
 
 	<!-- WorkOrder queries -->
 	<named-query name="WorkOrder.findByIds">
@@ -30,6 +38,20 @@
 		<query>SELECT w FROM WorkOrder w 
        		   WHERE w.vehicle.plateNumber = ?1</query>
 	</named-query>
+	
+	<named-query name="WorkOrder.findAssignedByMechanicId">
+		<query>SELECT w FROM WorkOrder w 
+       		   WHERE w.mechanic.id = ?1</query>
+	</named-query>
+
+	<!-- Client queries -->
+	<named-query name="Client.findByNif">
+		<query>select c from Client c where c.nif = ?1</query>
+	</named-query>
+	
+	<named-query name="Client.findAll">
+		<query>select c from Client c</query>
+	</named-query>
 
 	<!-- PaymentMean queries -->
 	<named-query name="PaymentMean.findByInvoiceId">
@@ -42,6 +64,13 @@
 			where f.id = ?1
 		</query>
 	</named-query>
+	
+	<named-query name="PaymentMean.findByClientNif">
+		<query>
+			select m from PaymentMean m
+			where m.client.nif = ?1
+		</query>
+	</named-query>
 
 	<!-- Mechanic queries -->
 	<named-query name="Mechanic.findByNif">
@@ -50,6 +79,10 @@
 			from Mechanic m
 			where m.nif = ?1
 		</query>
+	</named-query>
+	
+	<named-query name="Mechanic.findAll">
+		<query>select m from Mechanic m</query>
 	</named-query>
 
 	<!-- Invoice queries -->
@@ -62,35 +95,50 @@
 			select cast( coalesce(max(f.number) + 1, 1L) as bigint ) 
 			from Invoice f
 		</query>
-<!-- 	
-		This breaks if there is none invoice
-		<query>select max(f.number) + 1 from Invoice f</query>
--->
+	</named-query>
+
+	<!-- SparePart queries -->
+	<named-query name="SparePart.findByCode">
+		<query>select s from SparePart s where s.code = ?1</query>
 	</named-query>
 	
+	<named-query name="SparePart.findAll">
+		<query>select s from SparePart s</query>
+	</named-query>
+	
+	<named-query name="SparePart.findByDescription">
+		<query>select s from SparePart s where lower(s.description) like lower(?1)</query>
+	</named-query>
+
+	<!-- VehicleType queries -->
+	<named-query name="VehicleType.findAll">
+		<query>select vt from VehicleType vt</query>
+	</named-query>
+	
+	<named-query name="VehicleType.findByName">
+		<query>select vt from VehicleType vt where vt.name = ?1</query>
+	</named-query>
+
 	<!--Contract queries-->
 	<named-query name="Contract.findAll">
-		<query>SELECT c FROM Contract c
-		</query>
+		<query>SELECT c FROM Contract c</query>
 	</named-query>
 	
 	<named-query name="Contract.findAllInForce">
 		<query>SELECT c FROM Contract c WHERE c.state = :state</query>
 	</named-query>
-	
-	<!--
-	<named-query name="Contract.findEligibleForPayrollGeneration">
-		<query>SELECT DISTINCT c FROM Contract c
-            WHERE c.isActive = true 
-            AND c.startDate <= :monthEnd 
-            AND (c.endDate IS NULL OR c.endDate >= :monthStart)
-            AND NOT EXISTS (
-                SELECT p FROM Payroll p
-                WHERE p.contract = c
-                AND p.month = :monthStart)
-        </query>
+
+	<named-query name="Contract.findByMechanicId">
+		<query>SELECT c FROM Contract c WHERE c.mechanic.id = :mid</query>
 	</named-query>
-	-->
+
+	<named-query name="Contract.findByProfessionalGroupId">
+		<query>SELECT c FROM Contract c WHERE c.professionalGroup.id = :gid</query>
+	</named-query>
+
+	<named-query name="Contract.findByContractTypeId">
+		<query>SELECT c FROM Contract c WHERE c.contractType.id = :tid</query>
+	</named-query>
 
 	<!-- PayRoll queries -->
 	<named-query name="Payroll.findByContract">
@@ -136,19 +184,25 @@
 
 	<!-- ProfessionalGroup queries -->
 	<named-query name="ProfessionalGroup.findByName">
-		<query>SELECT pg
-			FROM ProfessionalGroup pg
-			WHERE pg.name = :name
-		</query>
+		<query>SELECT pg FROM ProfessionalGroup pg WHERE pg.name = :name</query>
 	</named-query>
 	
-		<named-query name="ProfessionalGroup.findAll">
-		<query>SELECT pg FROM ProfessionalGroup pg
-        </query>
+	<named-query name="ProfessionalGroup.findAll">
+		<query>SELECT pg FROM ProfessionalGroup pg</query>
 	</named-query>
 
+	<!-- ContractType queries -->
+	<named-query name="ContractType.findByName">
+		<query>SELECT ct FROM ContractType ct WHERE ct.name = :name</query>
+	</named-query>
+	
+	<named-query name="ContractType.findAll">
+		<query>SELECT ct FROM ContractType ct</query>
+	</named-query>
 
-	<!-- 
+</entity-mappings>
+
+<!-- 
 	Use this format if your query has greater than numeric comparisons the one
 	in this example
 	
@@ -165,4 +219,3 @@
 	</named-query>
  -->
 
-</entity-mappings>

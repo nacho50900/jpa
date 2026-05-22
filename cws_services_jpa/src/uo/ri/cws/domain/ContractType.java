@@ -60,5 +60,13 @@ public class ContractType extends BaseEntity {
         return "ContractType[name=" + name + 
                ", compensationDaysPerYear=" + compensationDaysPerYear + "]";
     }
-    
+
+    // Added
+    public void setCompensationDaysPerYear(double days) {
+        if (days < 0.0) {
+            throw new IllegalArgumentException(
+                    "Compensation days cannot be negative");
+        }
+        this.compensationDaysPerYear = days;
+    }
 }

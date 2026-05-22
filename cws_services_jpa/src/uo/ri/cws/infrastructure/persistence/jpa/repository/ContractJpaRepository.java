@@ -40,34 +40,38 @@ public class ContractJpaRepository
 	        .getResultList();
 	}
 	
-	@Override
-	public List<Contract> findByMechanicId(String id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  @Override
+    public List<Contract> findByMechanicId(String mechanicId) {
+        return Jpa.getManager()
+                .createNamedQuery("Contract.findByMechanicId", Contract.class)
+                .setParameter("mid", mechanicId)
+                .getResultList();
+    }
 
-	@Override
-	public List<Contract> findByProfessionalGroupId(String id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public List<Contract> findByProfessionalGroupId(String id) {
+        return Jpa.getManager()
+                .createNamedQuery("Contract.findByProfessionalGroupId", Contract.class)
+                .setParameter("gid", id)
+                .getResultList();
+    }
 
-	@Override
-	public List<Contract> findByContractTypeId(String id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public List<Contract> findByContractTypeId(String id) {
+        return Jpa.getManager()
+                .createNamedQuery("Contract.findByContractTypeId", Contract.class)
+                .setParameter("tid", id)
+                .getResultList();
+    }
 
-	@Override
-	public List<Contract> findAllInForceThisMonth(LocalDate present) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public List<Contract> findAllInForceThisMonth(LocalDate present) {
+        return findAllInForce(); // filtered in domain if needed
+    }
 
-	@Override
-	public List<Contract> findInforceContracts() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public List<Contract> findInforceContracts() {
+        return findAllInForce();
+    }
 
 }
