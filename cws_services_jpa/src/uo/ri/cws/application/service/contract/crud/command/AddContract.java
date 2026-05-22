@@ -62,7 +62,7 @@ public class AddContract implements Command<ContractDto> {
         // Validate FIXED_TERM requires end date
         boolean isFixedTerm = "FIXED_TERM".equalsIgnoreCase(type.getName());
         if (isFixedTerm) {
-            BusinessChecks.isTrue(dto.endDate != null,
+            ArgumentChecks.isTrue(dto.endDate != null,
                     "End date is mandatory for FIXED_TERM contracts");
             BusinessChecks.isTrue(!dto.endDate.isBefore(dto.startDate),
                     "End date cannot be before start date");

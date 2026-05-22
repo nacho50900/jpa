@@ -19,6 +19,8 @@ public class UpdateContract implements Command<Void> {
     public UpdateContract(ContractDto dto) {
         ArgumentChecks.isNotNull(dto, "ContractDto cannot be null");
         ArgumentChecks.isNotBlank(dto.id, "ID cannot be blank");
+        ArgumentChecks.isTrue(dto.annualBaseSalary > 0.0, 
+                "Annual base salary must be positive");
         this.dto = dto;
     }
 
@@ -34,12 +36,12 @@ public class UpdateContract implements Command<Void> {
                 "FIXED_TERM".equalsIgnoreCase(c.getContractType().getName()),
                 "Only FIXED_TERM contracts can be updated");
 
-        if (dto.annualBaseSalary > 0) {
-            c._setAnnualBaseSalary(dto.annualBaseSalary);
-        }
+        c.setAnnualBaseSalary(dto.annualBaseSalary);
+
         if (dto.endDate != null) {
             BusinessChecks.isTrue(!dto.endDate.isBefore(c.getStartDate()),
                     "End date cannot be before start date");
+            c.setEndDate(dto.endDate);
         }
         c.updatedNow();
         return null;

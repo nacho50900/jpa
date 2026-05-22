@@ -30,7 +30,6 @@ public class TerminateContract implements Command<Void> {
         BusinessChecks.isTrue(c.isInForce(),
                 "Only in-force contracts can be terminated");
 
-        // End date = last day of current month
         c.terminate(LocalDate.now());
         return null;
     }

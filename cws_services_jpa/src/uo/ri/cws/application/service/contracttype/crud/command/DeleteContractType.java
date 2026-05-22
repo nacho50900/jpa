@@ -12,17 +12,17 @@ import uo.ri.util.exception.BusinessException;
 
 public class DeleteContractType implements Command<Void> {
 
-    private String id;
+    private String contractTypeName; //TEST PASA NAME
     private ContractTypeRepository repo = Factories.repository.forContractType();
 
-    public DeleteContractType(String id) {
-        ArgumentChecks.isNotBlank(id, "ID cannot be blank");
-        this.id = id;
+    public DeleteContractType(String name) {
+        ArgumentChecks.isNotBlank(name, "ContractType name cannot be blank");
+        this.contractTypeName = name;
     }
 
     @Override
     public Void execute() throws BusinessException {
-        Optional<ContractType> oct = repo.findById(id);
+        Optional<ContractType> oct = repo.findByName(contractTypeName);
         BusinessChecks.exists(oct, "Contract type not found");
 
         ContractType ct = oct.get();

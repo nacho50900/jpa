@@ -10,6 +10,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -51,7 +52,7 @@ public class Contract extends BaseEntity {
     @ManyToOne(optional = false)
     private ProfessionalGroup professionalGroup;
 
-    @OneToMany(mappedBy = "contract")
+    @OneToMany(mappedBy = "contract", fetch = FetchType.EAGER)
     private Set<Payroll> payrolls = new HashSet<>();
 
     protected Contract() { }
@@ -64,9 +65,9 @@ public class Contract extends BaseEntity {
         ArgumentChecks.isNotNull(group, "ProfessionalGroup cannot be null");
         ArgumentChecks.isNotNull(signingDate, "Signing date cannot be null");
         ArgumentChecks.isTrue(
-        		annualBaseSalary >= 0.0, "Annual base salary cannot be negative");
+        		annualBaseSalary > 0.0, "Annual base salary must be positive");
 
-        LocalDate adjustedStart = signingDate.with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate adjustedStart = signingDate.with(TemporalAdjusters.firstDayOfNextMonth());
     
         LocalDate adjustedEnd = null;
         if (isFixedTerm(type)) {
@@ -92,7 +93,7 @@ public class Contract extends BaseEntity {
             adjustedEnd = null;
         }
 
-        this.startDate = signingDate.with(TemporalAdjusters.firstDayOfMonth());
+        this.startDate = signingDate.with(TemporalAdjusters.firstDayOfNextMonth());
         this.endDate = adjustedEnd;
         this.annualBaseSalary = annualBaseSalary;
         
@@ -109,14 +110,14 @@ public class Contract extends BaseEntity {
         ArgumentChecks.isNotNull(group, "ProfessionalGroup cannot be null");
         ArgumentChecks.isNotNull(signingDate, "Signing date cannot be null");
         ArgumentChecks.isTrue(
-        		annualBaseSalary >= 0.0, "Annual base salary cannot be negative");
+        		annualBaseSalary > 0.0, "Annual base salary must be positive");
     
         // NO PODEMOS HACER THIS() PORQUE NECESITAMOS ESTE CHECK
         ArgumentChecks.isTrue(!isFixedTerm(type),
         		"Short constructor cannot be used for FIXED_TERM contracts"
         		+ "(end date is mandatory)");
     
-        this.startDate = signingDate.with(TemporalAdjusters.firstDayOfMonth());
+        this.startDate = signingDate.with(TemporalAdjusters.firstDayOfNextMonth());
         this.annualBaseSalary = annualBaseSalary;
         this.endDate = null;
 
@@ -124,17 +125,17 @@ public class Contract extends BaseEntity {
         
         Associations.Employs.link(mechanic, this, type, group);
     }
-
+    
     private static double calculateTaxRate(double annualSalary) {
-        if (annualSalary <= 12450) {
+        if (annualSalary < 12450) {
             return 0.19;
-        } else if (annualSalary <= 20200) {
+        } else if (annualSalary < 20200) {
             return 0.24;
-        } else if (annualSalary <= 35200) {
+        } else if (annualSalary < 35200) {
             return 0.30;
-        } else if (annualSalary <= 60000) {
+        } else if (annualSalary < 60000) {
             return 0.37;
-        } else if (annualSalary <= 300000) {
+        } else if (annualSalary < 300000) {
             return 0.45;
         } else {
             return 0.47;
@@ -163,24 +164,33 @@ public class Contract extends BaseEntity {
         }
         if (terminationDate.isBefore(this.startDate)) {
             throw new IllegalArgumentException(
-            		"Termination date cannot be before start date");
+                    "Termination date cannot be before start date");
         }
 
-        // Ajuste al último día del mes
         this.endDate = terminationDate.with(TemporalAdjusters.lastDayOfMonth());
 
-        // Años de servicio medidos por número de nóminas completas (12 por año)
-        int years = this.getPayrolls().size() / 12;
+        int years = (int) java.time.temporal.ChronoUnit.YEARS.between(
+                this.startDate, this.endDate);
 
-        double dailyGross = this.annualBaseSalary / 365.0;
-        double compDaysPerYear = this.contractType.getCompensationDaysPerYear();
+        this.settlement = 0.0;
+        if (years > 0) {
+            double totalGross = 0.0;
+            for (Payroll p : this.payrolls) {
+                totalGross += p.getGrossSalary();
+            }
 
-        this.settlement = (years <= 0) ? 0.0 : years * dailyGross * compDaysPerYear;
+            // ERROR: Dont have payrolls as db not updated
+            // but using anual base Salry is no exact
+            
+            double annualGross = totalGross / years;
+            double dailyGross = annualGross / 365.0;
+            double compDaysPerYear = this.contractType.getCompensationDaysPerYear();
+            this.settlement = years * dailyGross * compDaysPerYear;
+        }
 
         this.state = ContractState.TERMINATED;
     }
-
-
+    
 	 public boolean hasPayrollForMonth(LocalDate month) {
 	     ArgumentChecks.isNotNull(month, "Month cannot be null");
 	     
@@ -250,16 +260,18 @@ public class Contract extends BaseEntity {
     public LocalDate getEndDate() {
         return endDate;
     }
+    
+    public void setEndDate(LocalDate endDate) {
+		this.endDate = endDate;
+	}
 
     public double getAnnualBaseSalary() {
         return annualBaseSalary;
     }
     
-    public void _setAnnualBaseSalary(double annualBaseSalary) {
-        if (annualBaseSalary < 0.0) {
-            throw new IllegalArgumentException(
-            		"Annual base salary cannot be negative");
-        }
+    public void setAnnualBaseSalary(double annualBaseSalary) {
+        ArgumentChecks.isTrue(
+        		annualBaseSalary > 0.0, "Annual base salary must be positive");
         this.annualBaseSalary = annualBaseSalary;
     }
 
@@ -282,6 +294,7 @@ public class Contract extends BaseEntity {
 	public Object getState() {
 		return state;
 	}
+	
 
 	void _setMechanic(Mechanic mechanic) {
 		this.mechanic = mechanic;

@@ -2,8 +2,6 @@ package uo.ri.cws.application.service;
 
 import uo.ri.cws.application.service.client.ClientCrudService;
 import uo.ri.cws.application.service.client.ClientHistoryService;
-import uo.ri.cws.application.service.client.crud.ClientCrudServiceImpl;
-import uo.ri.cws.application.service.client.history.ClientHistoryServiceImpl;
 import uo.ri.cws.application.service.contract.ContractCrudService;
 import uo.ri.cws.application.service.contract.crud.ContractCrudServiceImpl;
 import uo.ri.cws.application.service.contracttype.ContractTypeCrudService;
@@ -17,17 +15,13 @@ import uo.ri.cws.application.service.payroll.crud.PayrollServiceImpl;
 import uo.ri.cws.application.service.professionalgroup.ProfessionalGroupCrudService;
 import uo.ri.cws.application.service.professionalgroup.crud.ProfessionalGroupCrudServiceImpl;
 import uo.ri.cws.application.service.spare.SparePartCrudService;
-import uo.ri.cws.application.service.spare.crud.SparePartCrudServiceImpl;
 import uo.ri.cws.application.service.vechicle.crud.VehicleCrudServiceImpl;
 import uo.ri.cws.application.service.vehicle.VehicleCrudService;
 import uo.ri.cws.application.service.vehicletype.VehicleTypeCrudService;
-import uo.ri.cws.application.service.vehicletype.crud.VehicleTypeCrudServiceImpl;
 import uo.ri.cws.application.service.workorder.CloseWorkOrderService;
 import uo.ri.cws.application.service.workorder.ViewAssignedWorkOrdersService;
 import uo.ri.cws.application.service.workorder.WorkOrderCrudService;
-import uo.ri.cws.application.service.workorder.assigned.ViewAssignedWorkOrdersServiceImpl;
-import uo.ri.cws.application.service.workorder.close.CloseWorkOrderServiceImpl;
-import uo.ri.cws.application.service.workorder.crud.WorkOrderCrudServiceImpl;
+import uo.ri.util.exception.NotYetImplementedException;
 
 public class JpaServicesFactoryImpl implements ServiceFactory {
 
@@ -66,39 +60,41 @@ public class JpaServicesFactoryImpl implements ServiceFactory {
         return new VehicleCrudServiceImpl();
     }
 
-    @Override
-    public SparePartCrudService forSparePartCrudService() {
-        return new SparePartCrudServiceImpl();
-    }
+    // the not yet implemented section ------------------------------
 
-    @Override
-    public ClientCrudService forClientCrudService() {
-        return new ClientCrudServiceImpl();
-    }
+ 	@Override
+ 	public SparePartCrudService forSparePartCrudService() {
+ 		throw new NotYetImplementedException();
+ 	}
 
-    @Override
-    public CloseWorkOrderService forClosingWorkOrder() {
-        return new CloseWorkOrderServiceImpl();
-    }
+ 	@Override
+ 	public ClientCrudService forClientCrudService() {
+ 		throw new NotYetImplementedException();
+ 	}
 
-    @Override
-    public VehicleTypeCrudService forVehicleTypeCrudService() {
-        return new VehicleTypeCrudServiceImpl();
-    }
+ 	@Override
+ 	public CloseWorkOrderService forClosingWorkOrder() {
+ 		throw new NotYetImplementedException();
+ 	}
 
-    @Override
-    public ClientHistoryService forClientHistoryService() {
-        return new ClientHistoryServiceImpl();
-    }
+ 	@Override
+ 	public VehicleTypeCrudService forVehicleTypeCrudService() {
+ 		throw new NotYetImplementedException();
+ 	}
 
-    @Override
-    public WorkOrderCrudService forWorkOrderService() {
-        return new WorkOrderCrudServiceImpl();
-    }
+ 	@Override
+ 	public ClientHistoryService forClientHistoryService() {
+ 		throw new NotYetImplementedException();
+ 	}
 
-    @Override
-    public ViewAssignedWorkOrdersService forViewAssignedWorkOrdersService() {
-        return new ViewAssignedWorkOrdersServiceImpl();
-    }
+ 	@Override
+ 	public WorkOrderCrudService forWorkOrderService() {
+ 		throw new NotYetImplementedException();
+ 	}
 
+ 	@Override
+ 	public ViewAssignedWorkOrdersService forViewAssignedWorkOrdersService() {
+ 		throw new NotYetImplementedException();
+ 	}
+    
 }

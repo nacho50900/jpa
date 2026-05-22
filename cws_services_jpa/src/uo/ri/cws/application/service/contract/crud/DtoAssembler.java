@@ -43,6 +43,7 @@ public class DtoAssembler {
 		result.state = arg.getState().toString();
 		result.nif = arg.getMechanic().getNif();
 		result.settlement = arg.getSettlement();
+		result.numPayrolls = arg.getPayrolls().size();
 		return result;
 	}
 

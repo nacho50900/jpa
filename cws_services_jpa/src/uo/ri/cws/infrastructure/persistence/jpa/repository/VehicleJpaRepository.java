@@ -20,7 +20,6 @@ public class VehicleJpaRepository extends BaseJpaRepository<Vehicle>
                 .findFirst();
     }
 
-    @Override
     public List<Vehicle> findByClientNif(String nif) {
         return Jpa.getManager()
                 .createNamedQuery("Vehicle.findByClientNif", Vehicle.class)
