@@ -9,7 +9,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import uo.ri.cws.domain.base.BaseEntity;
 import uo.ri.util.assertion.ArgumentChecks;
 
@@ -34,12 +33,6 @@ public class Payroll extends BaseEntity {
     @Column(nullable = false) private double taxDeduction;
 
     @Column(nullable = false) private double nicDeduction;
-    
-    @Transient private double totalDeductions;
-
-    @Transient private double grossSalary;
-
-    @Transient private double netSalary;
 
     private static final int PAYMENTS_IN_YEAR = 14;
     private static final int PAYROLLS_IN_YEAR = 12;
@@ -92,10 +85,8 @@ public class Payroll extends BaseEntity {
         // Seguridad Social (empleado)
         this.nicDeduction = (annual / PAYROLLS_IN_YEAR) * STANDARD_NIC;
 
-        // Totales
-        this.totalDeductions = taxDeduction + nicDeduction;
-        this.grossSalary = incomes;
-        this.netSalary = incomes - totalDeductions;
+        // Totales pasados de variables a getters unicamente
+        //totalDeductions, grossSalary, netSalary
     }
 
     private double computeProductivityForMonth(Contract c, LocalDate payrollDate) {
@@ -169,16 +160,16 @@ public class Payroll extends BaseEntity {
         return nicDeduction;
     }
 
-    public double getTotalDeductions() {
-        return totalDeductions;
-    }
-
     public double getGrossSalary() {
-        return grossSalary;
+        return baseSalary + extraSalary + productivityEarning + trienniumEarning;
     }
-
+    
+    public double getTotalDeductions() {
+        return taxDeduction + nicDeduction;
+    }
+    
     public double getNetSalary() {
-        return netSalary;
+        return getGrossSalary() - getTotalDeductions();
     }
 
     public double getMonthlyBaseSalary() {

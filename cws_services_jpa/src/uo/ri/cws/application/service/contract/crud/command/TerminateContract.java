@@ -17,6 +17,7 @@ public class TerminateContract implements Command<Void> {
     private ContractRepository repo = Factories.repository.forContract();
 
     public TerminateContract(String contractId) {
+    	ArgumentChecks.isNotNull(contractId, "Contract ID cannot be null");
         ArgumentChecks.isNotBlank(contractId, "Contract ID cannot be blank");
         this.contractId = contractId;
     }

@@ -1,6 +1,7 @@
 package uo.ri.cws.domain;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Collections;
 import java.util.HashSet;
@@ -169,26 +170,29 @@ public class Contract extends BaseEntity {
 
         this.endDate = terminationDate.with(TemporalAdjusters.lastDayOfMonth());
 
-        int years = (int) java.time.temporal.ChronoUnit.YEARS.between(
-                this.startDate, this.endDate);
-
+    	long daysWorked = (this.startDate == null) ? 0
+    	    : ChronoUnit.DAYS.between(this.startDate, this.endDate.plusDays(1));
+    	
+    	System.out.println("Payrolls size: " + this.payrolls.size());
+    	
         this.settlement = 0.0;
-        if (years > 0) {
-            double totalGross = 0.0;
-            for (Payroll p : this.payrolls) {
-                totalGross += p.getGrossSalary();
-            }
-
-            // ERROR: Dont have payrolls as db not updated
-            // but using anual base Salry is no exact
-            
-            double annualGross = totalGross / years;
-            double dailyGross = annualGross / 365.0;
-            double compDaysPerYear = this.contractType.getCompensationDaysPerYear();
-            this.settlement = years * dailyGross * compDaysPerYear;
+        if (daysWorked > 365) {
+            long years = ChronoUnit.YEARS.between(this.startDate,
+            		this.endDate.plusDays(1));
+    	    double compDaysPerYear = this.contractType.getCompensationDaysPerYear();
+    	    
+    	    //double dailyGross = this.annualBaseSalary / 365.0; //NO DA EXACTO
+    	    
+    	    double totalGross = this.payrolls.stream()
+    	    	    .mapToDouble(Payroll::getGrossSalary)
+    	    	    .sum();
+    	    double dailyGross = (totalGross / years) / 365.0;
+    	    
+    	    this.settlement = dailyGross * compDaysPerYear * years;
         }
 
         this.state = ContractState.TERMINATED;
+    	this.updatedNow();
     }
     
 	 public boolean hasPayrollForMonth(LocalDate month) {
