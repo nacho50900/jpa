@@ -68,7 +68,7 @@ public class Contract extends BaseEntity {
         ArgumentChecks.isTrue(
         		annualBaseSalary > 0.0, "Annual base salary must be positive");
 
-        LocalDate adjustedStart = signingDate.with(TemporalAdjusters.firstDayOfNextMonth());
+        LocalDate adjustedStart = signingDate.with(TemporalAdjusters.firstDayOfMonth());
     
         LocalDate adjustedEnd = null;
         if (isFixedTerm(type)) {
@@ -94,7 +94,7 @@ public class Contract extends BaseEntity {
             adjustedEnd = null;
         }
 
-        this.startDate = signingDate.with(TemporalAdjusters.firstDayOfNextMonth());
+        this.startDate = signingDate.with(TemporalAdjusters.firstDayOfMonth());
         this.endDate = adjustedEnd;
         this.annualBaseSalary = annualBaseSalary;
         
@@ -118,7 +118,7 @@ public class Contract extends BaseEntity {
         		"Short constructor cannot be used for FIXED_TERM contracts"
         		+ "(end date is mandatory)");
     
-        this.startDate = signingDate.with(TemporalAdjusters.firstDayOfNextMonth());
+        this.startDate = signingDate.with(TemporalAdjusters.firstDayOfMonth());
         this.annualBaseSalary = annualBaseSalary;
         this.endDate = null;
 
@@ -170,12 +170,25 @@ public class Contract extends BaseEntity {
 
         this.endDate = terminationDate.with(TemporalAdjusters.lastDayOfMonth());
 
-    	long daysWorked = (this.startDate == null) ? 0
-    	    : ChronoUnit.DAYS.between(this.startDate, this.endDate.plusDays(1));
-    	
-    	System.out.println("Payrolls size: " + this.payrolls.size());
-    	
+        long years = ChronoUnit.YEARS.between(this.startDate, this.endDate.plusDays(1));
+
         this.settlement = 0.0;
+        if (years >= 1) {
+            double compDaysPerYear = this.contractType.getCompensationDaysPerYear();
+            
+            double totalGross = this.payrolls.stream()
+                    .mapToDouble(Payroll::getGrossSalary)
+                    .sum();
+            double annualGross = (totalGross / this.payrolls.size()) * 12.0; 
+            // media mensual * 12
+            double dailyGross = annualGross / 365.0;
+            
+            this.settlement = dailyGross * compDaysPerYear * years;
+        }   
+
+        this.state = ContractState.TERMINATED;
+        this.updatedNow();
+        /*
         if (daysWorked > 365) {
             long years = ChronoUnit.YEARS.between(this.startDate,
             		this.endDate.plusDays(1));
@@ -189,7 +202,7 @@ public class Contract extends BaseEntity {
     	    double dailyGross = (totalGross / years) / 365.0;
     	    
     	    this.settlement = dailyGross * compDaysPerYear * years;
-        }
+        }*/
 
         this.state = ContractState.TERMINATED;
     	this.updatedNow();

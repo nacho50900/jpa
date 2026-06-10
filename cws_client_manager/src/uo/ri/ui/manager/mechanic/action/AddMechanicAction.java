@@ -14,7 +14,7 @@ public class AddMechanicAction implements Action {
 
 		// Ask the user for data
 		MechanicDto m = new MechanicDto();
-		m.nif = Console.readString("Doi");
+		m.nif = Console.readString("Nif");
 		m.name = Console.readString("Name");
 		m.surname = Console.readString("Surname");
 

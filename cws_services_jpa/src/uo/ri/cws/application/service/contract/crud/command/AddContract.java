@@ -1,5 +1,7 @@
 package uo.ri.cws.application.service.contract.crud.command;
 
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Optional;
 
 import uo.ri.conf.Factories;
@@ -59,11 +61,15 @@ public class AddContract implements Command<ContractDto> {
         ContractType type = ot.get();
         ProfessionalGroup group = og.get();
 
+        LocalDate startDate = dto.startDate.with(TemporalAdjusters.firstDayOfNextMonth());
+        //Needed because of test extended and acceptance test compatibility
+        
         // Validate FIXED_TERM requires end date
         boolean isFixedTerm = "FIXED_TERM".equalsIgnoreCase(type.getName());
         if (isFixedTerm) {
-            ArgumentChecks.isTrue(dto.endDate != null,
+            ArgumentChecks.isNotNull(dto.endDate,
                     "End date is mandatory for FIXED_TERM contracts");
+            
             BusinessChecks.isTrue(!dto.endDate.isBefore(dto.startDate),
                     "End date cannot be before start date");
         }
@@ -71,10 +77,10 @@ public class AddContract implements Command<ContractDto> {
         Contract contract;
         if (isFixedTerm) {
             contract = new Contract(mechanic, type, group,
-                    dto.startDate, dto.endDate, dto.annualBaseSalary);
+            		startDate, dto.endDate, dto.annualBaseSalary);
         } else {
             contract = new Contract(mechanic, type, group,
-                    dto.startDate, dto.annualBaseSalary);
+            		startDate, dto.annualBaseSalary);
         }
 
         contractRepo.add(contract);
