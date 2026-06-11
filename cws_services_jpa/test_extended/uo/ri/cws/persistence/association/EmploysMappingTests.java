@@ -18,10 +18,6 @@ import uo.ri.cws.domain.Mechanic;
 import uo.ri.cws.domain.ProfessionalGroup;
 import uo.ri.cws.persistence.util.UnitOfWork;
 
-/**
- * Association mapping tests for the Employs relationship:
- * Mechanic - Contract - ContractType - ProfessionalGroup
- */
 class EmploysMappingTests {
 
     private UnitOfWork unitOfWork;
@@ -37,10 +33,12 @@ class EmploysMappingTests {
         factory = Persistence.createEntityManagerFactory("carworkshop");
         unitOfWork = UnitOfWork.over(factory);
 
-        mechanic     = new Mechanic("44444444D", "Bob", "Builder");
-        contractType = new ContractType("PERMANENT_E", 1.35);
-        group        = new ProfessionalGroup("GroupIII", 33.44, 0.03);
-        contract     = new Contract(mechanic, contractType, group,
+        mechanic     = new Mechanic("X9999994Z", "Test4", "Mechanic4");
+        contractType = new ContractType("TEST_PERM_EM", 1.35);
+        group        = new ProfessionalGroup("TEST_GRP_EM", 33.44, 0.03);
+
+        // annualBaseSalary must be > 0
+        contract = new Contract(mechanic, contractType, group,
                 LocalDate.now(), 22000.0);
 
         unitOfWork.persist(mechanic, contractType, group, contract);
@@ -48,7 +46,18 @@ class EmploysMappingTests {
 
     @AfterEach
     void tearDown() {
-        unitOfWork.remove(contract, mechanic, contractType, group);
+        if (contract != null) {
+			unitOfWork.remove(contract);
+		}
+        if (mechanic != null) {
+			unitOfWork.remove(mechanic);
+		}
+        if (contractType != null) {
+			unitOfWork.remove(contractType);
+		}
+        if (group != null) {
+			unitOfWork.remove(group);
+		}
         factory.close();
     }
 
@@ -115,22 +124,36 @@ class EmploysMappingTests {
     }
 
     /**
-     * Creating a second contract for the same mechanic terminates the first one.
+     * Creating a second contract for the same mechanic automatically
+     * terminates the first one (via Associations.Employs.link).
      */
     @Test
-    void testNewContractTerminatesPrevious() {
-        ContractType type2 = new ContractType("SEASONAL_E", 3.25);
-        Contract contract2 = new Contract(mechanic, type2, group,
+    void testNewContractTerminatesPreviousOne() {
+        Mechanic m2  = new Mechanic("X9999995Z", "Test5", "Mechanic5");
+        ContractType ct2 = new ContractType("TEST_SEAS_EM", 3.25);
+        // Second contract starts next month
+        Contract contract2 = new Contract(m2, ct2, group,
                 LocalDate.now().plusMonths(1), 25000.0);
-        unitOfWork.persist(type2, contract2);
+        unitOfWork.persist(m2, ct2, contract2);
 
-        Mechanic restored = unitOfWork.findById(Mechanic.class, mechanic.getId());
-        assertTrue(restored.getContracts().stream()
-                .anyMatch(c -> c.isInForce()));
-        assertTrue(restored.getContracts().stream()
-                .anyMatch(c -> c.isTerminated()));
+        // The previous contract for m2 (none) — test that contract itself is IN_FORCE
+        // Now create a second contract FOR THE SAME mechanic (mechanic, not m2)
+        ContractType ct3 = new ContractType("TEST_SEAS2_EM", 3.25);
+        Contract contract3 = new Contract(mechanic, ct3, group,
+                LocalDate.now().plusMonths(1), 26000.0);
+        unitOfWork.persist(ct3, contract3);
 
-        unitOfWork.remove(contract2, type2);
+        // The original contract should now be TERMINATED
+        Contract restoredFirst = unitOfWork.findById(
+                Contract.class, contract.getId());
+        assertTrue(restoredFirst.isTerminated());
+
+        // The new contract should be IN_FORCE
+        Contract restoredSecond = unitOfWork.findById(
+                Contract.class, contract3.getId());
+        assertTrue(restoredSecond.isInForce());
+
+        unitOfWork.remove(contract3, ct3, contract2, m2, ct2);
     }
 
 }

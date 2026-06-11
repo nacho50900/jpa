@@ -13,9 +13,6 @@ import jakarta.persistence.PersistenceException;
 import uo.ri.cws.domain.ProfessionalGroup;
 import uo.ri.cws.persistence.util.UnitOfWork;
 
-/**
- * Persistence mapping tests for ProfessionalGroup entity.
- */
 class ProfessionalGroupMappingTests {
 
     private ProfessionalGroup group;
@@ -26,8 +23,8 @@ class ProfessionalGroupMappingTests {
     void setUp() {
         factory = Persistence.createEntityManagerFactory("carworkshop");
         unitOfWork = UnitOfWork.over(factory);
-
-        group = new ProfessionalGroup("GroupI", 46.74, 0.05);
+        // Use unique name to avoid clashing with pre-loaded DB data
+        group = new ProfessionalGroup("TEST_GROUP_VIII", 46.74, 0.05);
     }
 
     @AfterEach
@@ -43,6 +40,7 @@ class ProfessionalGroupMappingTests {
     void testAllFieldsPersisted() {
         unitOfWork.persist(group);
 
+        // ProfessionalGroup overrides getId() from BaseEntity with its own @Id
         ProfessionalGroup restored = unitOfWork.findById(
                 ProfessionalGroup.class, group.getId());
 
@@ -60,10 +58,25 @@ class ProfessionalGroupMappingTests {
     @Test
     void testRepeatedNameNotAllowed() {
         unitOfWork.persist(group);
-        ProfessionalGroup repeated = new ProfessionalGroup("GroupI", 10.0, 0.01);
+        ProfessionalGroup repeated =
+                new ProfessionalGroup("TEST_GROUP_VIII", 10.0, 0.01);
 
         assertThrows(PersistenceException.class,
                 () -> unitOfWork.persist(repeated));
+    }
+
+    /**
+     * setTrienniumPayment and setProductivityRate work correctly.
+     */
+    @Test
+    void testSetters() {
+    	unitOfWork.persist(group);
+    	
+        group.setTrienniumPayment(99.0);
+        group.setProductivityRate(0.10);
+
+        assertEquals(99.0, group.getTrienniumPayment(), 0.001);
+        assertEquals(0.10, group.getProductivityRate(), 0.001);
     }
 
 }

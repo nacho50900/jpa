@@ -13,9 +13,6 @@ import jakarta.persistence.PersistenceException;
 import uo.ri.cws.domain.ContractType;
 import uo.ri.cws.persistence.util.UnitOfWork;
 
-/**
- * Persistence mapping tests for ContractType entity.
- */
 class ContractTypeMappingTests {
 
     private ContractType contractType;
@@ -26,8 +23,7 @@ class ContractTypeMappingTests {
     void setUp() {
         factory = Persistence.createEntityManagerFactory("carworkshop");
         unitOfWork = UnitOfWork.over(factory);
-
-        contractType = new ContractType("PERMANENT", 1.35);
+        contractType = new ContractType("TEST_PERMANENT", 1.35);
     }
 
     @AfterEach
@@ -58,10 +54,24 @@ class ContractTypeMappingTests {
     @Test
     void testRepeatedNameNotAllowed() {
         unitOfWork.persist(contractType);
-        ContractType repeated = new ContractType("PERMANENT", 2.0);
+        ContractType repeated = new ContractType("TEST_PERMANENT", 2.0);
 
         assertThrows(PersistenceException.class,
                 () -> unitOfWork.persist(repeated));
+    }
+
+    /**
+     * setCompensationDaysPerYear updates the value correctly.
+     */
+    @Test
+    void testUpdateCompensationDays() {
+        unitOfWork.persist(contractType);
+        contractType.setCompensationDaysPerYear(3.5);
+
+        //ContractType restored = unitOfWork.findById(
+          //      ContractType.class, contractType.getId());
+        // After update the in-memory object reflects the new value
+        assertEquals(3.5, contractType.getCompensationDaysPerYear(), 0.001);
     }
 
 }

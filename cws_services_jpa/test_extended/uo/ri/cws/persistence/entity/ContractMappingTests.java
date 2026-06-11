@@ -2,6 +2,7 @@ package uo.ri.cws.persistence.entity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.LocalDate;
 
@@ -17,9 +18,6 @@ import uo.ri.cws.domain.Mechanic;
 import uo.ri.cws.domain.ProfessionalGroup;
 import uo.ri.cws.persistence.util.UnitOfWork;
 
-/**
- * Persistence mapping tests for Contract entity.
- */
 class ContractMappingTests {
 
     private Contract contract;
@@ -34,10 +32,13 @@ class ContractMappingTests {
         factory = Persistence.createEntityManagerFactory("carworkshop");
         unitOfWork = UnitOfWork.over(factory);
 
-        mechanic     = new Mechanic("11111111A", "John", "Doe");
-        contractType = new ContractType("PERMANENT", 1.35);
-        group        = new ProfessionalGroup("GroupI", 46.74, 0.05);
-        contract     = new Contract(mechanic, contractType, group,
+        // Use names/NIFs unlikely to clash with existing test DB data
+        mechanic     = new Mechanic("X9999991Z", "Test", "Mechanic");
+        contractType = new ContractType("TEST_PERM_CM", 1.35);
+        group        = new ProfessionalGroup("TEST_GRP_CM", 46.74, 0.05);
+
+        // annualBaseSalary must be > 0 (not >= 0)
+        contract = new Contract(mechanic, contractType, group,
                 LocalDate.now(), 24000.0);
 
         unitOfWork.persist(mechanic, contractType, group, contract);
@@ -66,7 +67,53 @@ class ContractMappingTests {
     }
 
     /**
-     * Contract recovers its mechanic, contract type and professional group.
+     * A PERMANENT contract has no end date.
+     */
+    @Test
+    void testPermanentContractHasNoEndDate() {
+        Contract restored = unitOfWork.findById(Contract.class, contract.getId());
+        assertNull(restored.getEndDate());
+    }
+
+    /**
+     * A FIXED_TERM contract end date is adjusted to last day of its month.
+     */
+    @Test
+    void testFixedTermEndDateAdjustedToLastDayOfMonth() {
+        Mechanic m2 = null;
+        ContractType ft = null;
+        Contract fixed = null;
+
+        try {
+            m2 = new Mechanic("X9999992Z", "Test2", "Mechanic2");
+            ft = new ContractType("FIXED_TERM", 4.2);
+            LocalDate endDate = LocalDate.of(2026, 12, 15);
+
+            fixed = new Contract(m2, ft, group,
+                    LocalDate.now(), endDate, 20000.0);
+
+            unitOfWork.persist(m2, ft, fixed);
+
+            Contract restored = unitOfWork.findById(Contract.class, fixed.getId());
+
+            // December has 31 days, not 30
+            assertEquals(LocalDate.of(2026, 12, 31), restored.getEndDate());
+
+        } finally {
+            if (fixed != null) {
+				unitOfWork.remove(fixed);
+			}
+            if (m2 != null) {
+				unitOfWork.remove(m2);
+			}
+            if (ft != null) {
+				unitOfWork.remove(ft);
+			}
+        }
+    }
+
+    /**
+     * Contract recovers its associations.
      */
     @Test
     void testContractRecoversAssociations() {
@@ -78,25 +125,12 @@ class ContractMappingTests {
     }
 
     /**
-     * A new FIXED_TERM contract has an end date adjusted to last day of month.
+     * A new IN_FORCE contract starts with zero settlement.
      */
     @Test
-    void testFixedTermContractEndDateAdjusted() {
-        ContractType fixedType = new ContractType("FIXED_TERM", 4.2);
-        LocalDate endDate = LocalDate.now().plusMonths(6);
-        Contract fixed = new Contract(
-                new Mechanic("22222222B", "Jane", "Smith"),
-                fixedType, group,
-                LocalDate.now(), endDate, 18000.0);
-
-        unitOfWork.persist(fixedType, fixed.getMechanic(), fixed);
-
-        Contract restored = unitOfWork.findById(Contract.class, fixed.getId());
-
-        assertEquals(endDate.withDayOfMonth(endDate.lengthOfMonth()),
-                restored.getEndDate());
-
-        unitOfWork.remove(fixed, fixed.getMechanic(), fixedType);
+    void testNewContractHasZeroSettlement() {
+        Contract restored = unitOfWork.findById(Contract.class, contract.getId());
+        assertEquals(0.0, restored.getSettlement(), 0.001);
     }
 
 }

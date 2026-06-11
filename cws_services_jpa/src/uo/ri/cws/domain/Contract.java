@@ -188,24 +188,6 @@ public class Contract extends BaseEntity {
 
         this.state = ContractState.TERMINATED;
         this.updatedNow();
-        /*
-        if (daysWorked > 365) {
-            long years = ChronoUnit.YEARS.between(this.startDate,
-            		this.endDate.plusDays(1));
-    	    double compDaysPerYear = this.contractType.getCompensationDaysPerYear();
-    	    
-    	    //double dailyGross = this.annualBaseSalary / 365.0; //NO DA EXACTO
-    	    
-    	    double totalGross = this.payrolls.stream()
-    	    	    .mapToDouble(Payroll::getGrossSalary)
-    	    	    .sum();
-    	    double dailyGross = (totalGross / years) / 365.0;
-    	    
-    	    this.settlement = dailyGross * compDaysPerYear * years;
-        }*/
-
-        this.state = ContractState.TERMINATED;
-    	this.updatedNow();
     }
     
 	 public boolean hasPayrollForMonth(LocalDate month) {

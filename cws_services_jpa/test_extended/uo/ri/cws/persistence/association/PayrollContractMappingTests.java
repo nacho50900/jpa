@@ -18,9 +18,6 @@ import uo.ri.cws.domain.Payroll;
 import uo.ri.cws.domain.ProfessionalGroup;
 import uo.ri.cws.persistence.util.UnitOfWork;
 
-/**
- * Association mapping tests for the Payroll - Contract relationship.
- */
 class PayrollContractMappingTests {
 
     private UnitOfWork unitOfWork;
@@ -37,13 +34,13 @@ class PayrollContractMappingTests {
         factory = Persistence.createEntityManagerFactory("carworkshop");
         unitOfWork = UnitOfWork.over(factory);
 
-        mechanic     = new Mechanic("55555555E", "Carol", "Vorderman");
-        contractType = new ContractType("PERMANENT_PC", 1.35);
-        group        = new ProfessionalGroup("GroupIV", 28.85, 0.035);
+        mechanic     = new Mechanic("X9999996Z", "Test6", "Mechanic6");
+        contractType = new ContractType("TEST_PERM_PCM", 1.35);
+        group        = new ProfessionalGroup("TEST_GRP_PCM", 28.85, 0.035);
 
-        LocalDate startDate = LocalDate.now().minusMonths(3);
+        // Contract started 3 months ago — payroll for last month is valid
         contract = new Contract(mechanic, contractType, group,
-                startDate, 18000.0);
+                LocalDate.now().minusMonths(3), 18000.0);
 
         LocalDate lastMonth = LocalDate.now().minusMonths(1);
         payroll = contract.generatePayrollForMonth(lastMonth);
@@ -59,6 +56,7 @@ class PayrollContractMappingTests {
 
     /**
      * A contract recovers its payrolls.
+     * Note: Contract uses FetchType.EAGER for payrolls so they are loaded.
      */
     @Test
     void testContractRecoversPayrolls() {
@@ -74,15 +72,15 @@ class PayrollContractMappingTests {
     @Test
     void testPayrollRecoversContract() {
         Payroll restored = unitOfWork.findById(Payroll.class, payroll.getId());
-
         assertEquals(contract, restored.getContract());
     }
 
     /**
-     * Two payrolls can exist for the same contract in different months.
+     * Two payrolls for the same contract in different months are both persisted.
      */
     @Test
     void testTwoPayrollsForSameContract() {
+        // Generate payroll for two months ago (also valid)
         LocalDate twoMonthsAgo = LocalDate.now().minusMonths(2);
         Payroll payroll2 = contract.generatePayrollForMonth(twoMonthsAgo);
         unitOfWork.persist(payroll2);
@@ -90,6 +88,7 @@ class PayrollContractMappingTests {
         Contract restored = unitOfWork.findById(Contract.class, contract.getId());
         assertEquals(2, restored.getPayrolls().size());
 
+        // Cleanup
         unitOfWork.remove(payroll2);
     }
 

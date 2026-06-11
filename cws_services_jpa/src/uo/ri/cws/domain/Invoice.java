@@ -155,7 +155,7 @@ public class Invoice extends BaseEntity {
         return new HashSet<>(charges);
     }
 
-    public Set<Charge> _getCharges() {
+    Set<Charge> _getCharges() {
         return charges;
     }
 

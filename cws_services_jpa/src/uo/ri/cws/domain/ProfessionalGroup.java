@@ -4,11 +4,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import uo.ri.cws.domain.base.BaseEntity;
@@ -17,9 +15,6 @@ import uo.ri.util.assertion.ArgumentChecks;
 @Entity
 @Table(name = "TPROFESSIONALGROUPS")
 public class ProfessionalGroup extends BaseEntity {
-
-    @Id
-    protected String id = UUID.randomUUID().toString();
 
     @Column(nullable = false, unique = true)
     private String name;
@@ -97,11 +92,6 @@ public class ProfessionalGroup extends BaseEntity {
     public void setProductivityRate(double productivityRate) {
         ArgumentChecks.isTrue(productivityRate >= 0, "Productivity rate must be >= 0");
         this.productivityRate = productivityRate;
-    }
-
-    @Override
-	public String getId() {
-        return id;
     }
 
     public String getName() {

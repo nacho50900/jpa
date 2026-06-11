@@ -139,10 +139,6 @@
 	<named-query name="Contract.findByContractTypeId">
 		<query>SELECT c FROM Contract c WHERE c.contractType.id = :tid</query>
 	</named-query>
-	
-	<named-query name="Contract.findByContractTypeId">
-		<query>SELECT c FROM Contract c WHERE c.contractType.id = :tid</query>
-	</named-query>
 
 	<!-- PayRoll queries -->
 	<named-query name="Payroll.findByContract">

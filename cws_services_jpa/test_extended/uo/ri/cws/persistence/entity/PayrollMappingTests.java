@@ -18,9 +18,6 @@ import uo.ri.cws.domain.Payroll;
 import uo.ri.cws.domain.ProfessionalGroup;
 import uo.ri.cws.persistence.util.UnitOfWork;
 
-/**
- * Persistence mapping tests for Payroll entity.
- */
 class PayrollMappingTests {
 
     private Payroll payroll;
@@ -36,16 +33,15 @@ class PayrollMappingTests {
         factory = Persistence.createEntityManagerFactory("carworkshop");
         unitOfWork = UnitOfWork.over(factory);
 
-        mechanic     = new Mechanic("33333333C", "Alice", "Wonderland");
-        contractType = new ContractType("PERMANENT_P", 1.35);
-        group        = new ProfessionalGroup("GroupII", 38.12, 0.045);
+        mechanic     = new Mechanic("X9999993Z", "Test3", "Mechanic3");
+        contractType = new ContractType("TEST_PERM_PM", 1.35);
+        group        = new ProfessionalGroup("TEST_GRP_PM", 38.12, 0.045);
 
-        // Contract started 2 months ago so payroll date is valid
-        LocalDate startDate = LocalDate.now().minusMonths(2);
+        // Contract started 3 months ago so last month payroll is valid
         contract = new Contract(mechanic, contractType, group,
-                startDate, 20000.0);
+                LocalDate.now().minusMonths(3), 20000.0);
 
-        // Generate payroll for last month
+        // Generate payroll for last month (safe: contract started 3 months ago)
         LocalDate lastMonth = LocalDate.now().minusMonths(1);
         payroll = contract.generatePayrollForMonth(lastMonth);
 
@@ -59,13 +55,15 @@ class PayrollMappingTests {
     }
 
     /**
-     * All numeric fields of Payroll are persisted properly.
+     * All stored fields of Payroll are persisted properly.
+     * Note: grossSalary, totalDeductions, netSalary are computed (not stored).
      */
     @Test
-    void testAllFieldsPersisted() {
+    void testAllStoredFieldsPersisted() {
         Payroll restored = unitOfWork.findById(Payroll.class, payroll.getId());
 
         assertEquals(payroll.getId(), restored.getId());
+        assertNotNull(restored.getDate());
         assertEquals(payroll.getMonthlyBaseSalary(),
                 restored.getMonthlyBaseSalary(), 0.001);
         assertEquals(payroll.getExtraSalary(),
@@ -78,7 +76,16 @@ class PayrollMappingTests {
                 restored.getTaxDeduction(), 0.001);
         assertEquals(payroll.getNicDeduction(),
                 restored.getNicDeduction(), 0.001);
-        assertNotNull(restored.getDate());
+    }
+
+    /**
+     * Payroll date is set to last day of the month.
+     */
+    @Test
+    void testPayrollDateIsLastDayOfMonth() {
+        Payroll restored = unitOfWork.findById(Payroll.class, payroll.getId());
+        LocalDate date = restored.getDate();
+        assertEquals(date.lengthOfMonth(), date.getDayOfMonth());
     }
 
     /**
@@ -88,6 +95,27 @@ class PayrollMappingTests {
     void testPayrollRecoversContract() {
         Payroll restored = unitOfWork.findById(Payroll.class, payroll.getId());
         assertEquals(contract, restored.getContract());
+    }
+
+    /**
+     * Computed fields are derived correctly from stored ones.
+     */
+    @Test
+    void testComputedFieldsConsistency() {
+        Payroll restored = unitOfWork.findById(Payroll.class, payroll.getId());
+
+        double expectedGross = restored.getMonthlyBaseSalary()
+                + restored.getExtraSalary()
+                + restored.getProductivityEarning()
+                + restored.getTrienniumEarning();
+
+        double expectedDeductions = restored.getTaxDeduction()
+                + restored.getNicDeduction();
+
+        assertEquals(expectedGross, restored.getGrossSalary(), 0.001);
+        assertEquals(expectedDeductions, restored.getTotalDeductions(), 0.001);
+        assertEquals(expectedGross - expectedDeductions,
+                restored.getNetSalary(), 0.001);
     }
 
 }

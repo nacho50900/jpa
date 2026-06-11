@@ -79,7 +79,7 @@ public class Vehicle extends BaseEntity {
 		return client;
 	}
 
-	protected void _setClient(Client client) {
+	void _setClient(Client client) {
 		this.client = client;
 	}
 	
@@ -88,7 +88,7 @@ public class Vehicle extends BaseEntity {
 		return vehicleType;
 	}
 
-	protected void _setVehicleType(VehicleType type) {
+	void _setVehicleType(VehicleType type) {
 		this.vehicleType = type;
 	}
 	
@@ -96,7 +96,7 @@ public class Vehicle extends BaseEntity {
 		return new HashSet<WorkOrder>(workOrders);
 	}
 
-	protected Set<WorkOrder> _getWorkOrders() {
+	Set<WorkOrder> _getWorkOrders() {
 		return workOrders;
 	}
 	
@@ -106,7 +106,6 @@ public class Vehicle extends BaseEntity {
 	           ", model=" + model + "]";
 	}
 	
-	// Added
     public void setMake(String make) {
         uo.ri.util.assertion.ArgumentChecks.isNotBlank(make, "make can not be blank");
         this.make = make;
