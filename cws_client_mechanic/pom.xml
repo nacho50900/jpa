@@ -18,7 +18,7 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
 				<configuration>
-					<mainClass>uo.ri.ui.MechanicMain</mainClass>
+					<mainClass>uo.ri.ui.SwingMain</mainClass>
 				</configuration>
 			</plugin>
 		</plugins>
