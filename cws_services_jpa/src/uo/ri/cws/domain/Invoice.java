@@ -84,7 +84,7 @@ public class Invoice extends BaseEntity {
         if (workOrders.contains(workOrder)) {
             return;
         }
-		workOrders.add(workOrder);
+		//workOrders.add(workOrder); not needed
 		Associations.Bills.link(this, workOrder);
 		computeAmount();
 		workOrder.markAsInvoiced();

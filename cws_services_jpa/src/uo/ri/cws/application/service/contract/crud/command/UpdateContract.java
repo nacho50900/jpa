@@ -31,10 +31,10 @@ public class UpdateContract implements Command<Void> {
 
         Contract c = oc.get();
         BusinessChecks.hasVersion(dto.version, c.getVersion());
-        BusinessChecks.isTrue(c.isInForce(), "Only in-force contracts can be updated");
-        BusinessChecks.isTrue(
-                "FIXED_TERM".equalsIgnoreCase(c.getContractType().getName()),
-                "Only FIXED_TERM contracts can be updated");
+        BusinessChecks.isTrue(c.isInForce(), 
+        		"Only in-force contracts can be updated");
+        BusinessChecks.isTrue(Contract.isFixedTerm(c.getContractType()), 
+        		"Only FIXED_TERM contracts can be updated");
 
         c.setAnnualBaseSalary(dto.annualBaseSalary);
 

@@ -143,7 +143,7 @@ public class Contract extends BaseEntity {
         }
     }
     
-    private static boolean isFixedTerm(ContractType type) {
+    public static boolean isFixedTerm(ContractType type) {
         // According to tests, the name "FIXED_TERM" is the discriminator
         return "FIXED_TERM".equalsIgnoreCase(type.getName());
     }
@@ -290,10 +290,9 @@ public class Contract extends BaseEntity {
         return payrolls;
     }
 
-	public Object getState() {
+	public ContractState getState() {
 		return state;
 	}
-	
 
 	void _setMechanic(Mechanic mechanic) {
 		this.mechanic = mechanic;

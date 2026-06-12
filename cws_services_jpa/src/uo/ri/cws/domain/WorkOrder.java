@@ -113,14 +113,11 @@ public class WorkOrder extends BaseEntity {
 	}
 
 	public void assignTo(Mechanic mechanic) {
-		ArgumentChecks.isNotNull(mechanic, "mechanic can not be null");
+		ArgumentChecks.isNotNull(mechanic, "Cannot assign a work order "
+	    		+ "without a mechanic");
 	    if (state != WorkOrderState.OPEN) {
 	        throw new IllegalStateException();
 	    }
-		if (mechanic == null) {
-		    throw new IllegalStateException("Cannot unassign a work order "
-		    		+ "without a mechanic");
-		}
 	    Associations.Assigns.link(mechanic, this);
 	    state = WorkOrderState.ASSIGNED;
 	}

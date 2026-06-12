@@ -87,7 +87,7 @@
 
 	<!-- Invoice queries -->
 	<named-query name="Invoice.findByNumber">
-		<query>select f from Invoice f where f.number = ?1</query>
+		<query>select f from Invoice f where f.number = :number</query>
 	</named-query>
 
 	<named-query name="Invoice.getNextInvoiceNumber">

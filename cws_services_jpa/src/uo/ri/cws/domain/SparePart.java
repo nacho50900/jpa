@@ -77,7 +77,7 @@ public class SparePart extends BaseEntity
 		return price;
 	}
 
-	public double getStock() {
+	public int getStock() {
 		return stock;
 	}
 
