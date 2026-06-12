@@ -46,7 +46,7 @@ public abstract class PaymentMean extends BaseEntity {
 		return new HashSet<>( charges );
 	}
 
-	public Set<Charge> _getCharges() {
+	Set<Charge> _getCharges() {
 		return charges;
 	}
 
