@@ -34,6 +34,7 @@
 			<property name="jakarta.persistence.jdbc.url" value="jdbc:hsqldb:file:../cws_database/test;files_readonly=true"/>
 			<!-- 
 			<property name="jakarta.persistence.jdbc.url" value="jdbc:hsqldb:hsql://localhost" />
+			
 			<property name="jakarta.persistence.jdbc.url" value="jdbc:hsqldb:mem:test" />
 -->
 			<property name="jakarta.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver" />

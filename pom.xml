@@ -11,7 +11,7 @@
 	<modules>
 		<module>cws_util</module>
 		<module>cws_service_interfaces</module>
-		<module>cws_services_jpa</module>
+		<module>UO300737</module>
 		<module>cws_aceptance_tests</module>
 		<module>cws_client_manager</module>
 		<module>cws_client_cashier</module>

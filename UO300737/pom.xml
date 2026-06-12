@@ -10,8 +10,8 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>cws_services_jpa</artifactId>
-	<name>cws_services_jpa</name>
+	<artifactId>UO300737</artifactId>
+	<name>UO300737</name>
 
 	<dependencies>
 		<dependency>
